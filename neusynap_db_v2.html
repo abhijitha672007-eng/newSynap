@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NeuSynap DB — Neurological Disease Bioinformatics Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&family=Literata:ital,opsz,wght@0,7..72,300;0,7..72,400;1,7..72,300&display=swap" rel="stylesheet">
+<style>
+:root{--teal:#0e9f8a;--teal-mid:#1dbfa8;--navy:#0a1628;--navy2:#0f2044;--accent:#4af0d8;--accent2:#7dd3fc;--warn:#f59e0b;--danger:#ef4444;--success:#22c55e;--text:#e2eaf8;--text-muted:#7da8c8;--text-dim:#3d6080;--surface:#0d1f3a;--surface2:#112347;--border:rgba(74,240,216,0.13);--border2:rgba(74,240,216,0.22);--r:8px;--rl:14px}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}
+body{font-family:'Syne',sans-serif;background:var(--navy);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
+.topbar{background:rgba(10,22,40,0.97);border-bottom:1px solid var(--border2);padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100;backdrop-filter:blur(8px);gap:.8rem}
+.logo-wrap{display:flex;align-items:center;gap:11px;flex-shrink:0}
+.brand{font-size:1.18rem;font-weight:800;letter-spacing:-.02em;color:var(--accent)}
+.tagline{font-size:.6rem;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase}
+.topnav{display:flex;gap:1px;overflow-x:auto;scrollbar-width:none}
+.topnav::-webkit-scrollbar{display:none}
+.topnav a{color:var(--text-muted);text-decoration:none;font-size:.76rem;font-weight:500;padding:5px 11px;border-radius:var(--r);transition:all .15s;white-space:nowrap;cursor:pointer}
+.topnav a:hover,.topnav a.active{color:var(--accent);background:rgba(74,240,216,0.08)}
+.ncbi-badge{font-size:.65rem;font-family:'IBM Plex Mono',monospace;color:var(--teal);border:1px solid var(--border2);padding:3px 9px;border-radius:4px;flex-shrink:0;display:flex;align-items:center;gap:5px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--success);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.hero{background:linear-gradient(155deg,#0a1628,#0d2040 55%,#081535);border-bottom:1px solid var(--border);padding:2.5rem 1.5rem 2rem;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:380px;height:380px;background:radial-gradient(circle,rgba(74,240,216,0.05) 0%,transparent 70%);pointer-events:none}
+.hi{max-width:1080px;margin:0 auto}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:.9rem}
+.chip{font-family:'IBM Plex Mono',monospace;font-size:.63rem;padding:2px 9px;border-radius:20px;border:1px solid;letter-spacing:.06em}
+.c-t{border-color:var(--teal);color:var(--teal)}.c-b{border-color:#60a5fa;color:#60a5fa}.c-a{border-color:var(--warn);color:var(--warn)}
+.hero h1{font-size:2.1rem;font-weight:800;line-height:1.06;letter-spacing:-.03em;margin-bottom:.75rem;color:#fff}
+.hero h1 span{color:var(--accent)}
+.hero p{font-family:'Literata',serif;color:var(--text-muted);font-size:.96rem;max-width:570px;line-height:1.7;margin-bottom:1.2rem}
+.stats-row{display:flex;gap:1.7rem;flex-wrap:wrap}
+.sn{font-size:1.3rem;font-weight:800;color:var(--accent);font-family:'IBM Plex Mono',monospace}
+.sl{font-size:.66rem;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase}
+.tabs-wrap{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:60px;z-index:90}
+.tabs{max-width:1080px;margin:0 auto;display:flex;padding:0 1.5rem;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tb{background:none;border:none;color:var(--text-muted);font-family:'Syne',sans-serif;font-size:.78rem;font-weight:500;padding:12px 15px;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.tb:hover{color:var(--text)}.tb.active{color:var(--accent);border-bottom-color:var(--accent)}
+.main{max-width:1080px;margin:0 auto;padding:1.6rem 1.5rem}
+.tp{display:none}.tp.active{display:block}
+.sh{margin-bottom:1.2rem}
+.sh h2{font-size:1.2rem;font-weight:700;letter-spacing:-.01em;margin-bottom:.22rem}
+.sh p{color:var(--text-muted);font-size:.83rem;font-family:'Literata',serif}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:1.1rem 1.3rem;margin-bottom:.85rem}
+.ct{font-size:.78rem;font-weight:600;color:var(--accent);letter-spacing:.04em;text-transform:uppercase;margin-bottom:.85rem;font-family:'IBM Plex Mono',monospace}
+label{display:block;font-size:.72rem;color:var(--text-muted);margin-bottom:4px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;font-family:'IBM Plex Mono',monospace}
+input,select,textarea{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:.83rem;padding:9px 12px;outline:none;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--teal-mid);box-shadow:0 0 0 3px rgba(29,191,168,0.11)}
+select option{background:#0f2044}
+textarea{resize:vertical;min-height:105px;font-size:.76rem;line-height:1.5}
+.fr{margin-bottom:.85rem}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.85rem;margin-bottom:.85rem}
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.85rem;margin-bottom:.85rem}
+.sc{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.85rem;margin-bottom:.85rem}
+.btn{display:inline-flex;align-items:center;gap:6px;font-family:'Syne',sans-serif;font-size:.83rem;font-weight:600;padding:9px 18px;border-radius:var(--r);border:none;cursor:pointer;transition:all .15s;letter-spacing:.01em;text-decoration:none}
+.bp{background:var(--teal);color:#fff}.bp:hover{background:var(--teal-mid);transform:translateY(-1px)}
+.bo{background:transparent;color:var(--accent);border:1px solid var(--border2)}.bo:hover{background:rgba(74,240,216,0.07)}
+.bs{font-size:.74rem;padding:6px 12px}
+.bd{background:#7f1d1d;color:#fca5a5}.bd:hover{background:#991b1b}
+.br{display:flex;gap:8px;flex-wrap:wrap;margin-top:.5rem}
+.sb{display:flex;gap:8px;margin-bottom:.9rem}
+.sb input{flex:1}
+.fr-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:.9rem}
+.fc{font-size:.7rem;padding:4px 12px;border-radius:20px;border:1px solid var(--border);color:var(--text-muted);cursor:pointer;font-family:'IBM Plex Mono',monospace;background:none;transition:all .14s}
+.fc:hover,.fc.active{border-color:var(--teal);color:var(--teal);background:rgba(14,159,138,0.07)}
+.rt{width:100%;border-collapse:collapse;font-size:.78rem;font-family:'IBM Plex Mono',monospace}
+.rt th{text-align:left;padding:8px 12px;font-size:.65rem;color:var(--teal);letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--border2);background:var(--surface2)}
+.rt td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.rt tr:hover td{background:rgba(74,240,216,0.025)}
+.rt a{color:var(--accent2);text-decoration:none}.rt a:hover{text-decoration:underline}
+.bge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:.65rem;font-weight:500;font-family:'IBM Plex Mono',monospace}
+.bg-g{background:rgba(34,197,94,0.13);color:#4ade80}.bg-a{background:rgba(245,158,11,0.13);color:#fbbf24}
+.bg-r{background:rgba(239,68,68,0.13);color:#f87171}.bg-b{background:rgba(125,211,252,0.13);color:#7dd3fc}
+.bg-t{background:rgba(74,240,216,0.1);color:var(--accent)}
+.bh{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:.9rem 1.1rem;margin-bottom:.65rem;transition:border-color .15s}
+.bh:hover{border-color:var(--border2)}
+.bh-top{display:flex;justify-content:space-between;align-items:flex-start;gap:.9rem;flex-wrap:wrap;margin-bottom:.5rem}
+.hacc{font-family:'IBM Plex Mono',monospace;font-size:.75rem;color:var(--accent2);font-weight:500}
+.hdesc{font-size:.86rem;font-weight:600;line-height:1.3;margin:.18rem 0}
+.hsc{display:flex;gap:.7rem;font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--text-muted);flex-wrap:wrap}
+.hsc span span{color:var(--text)}
+.pb{background:var(--surface2);border-radius:20px;height:5px;flex:1;overflow:hidden}
+.pf{height:100%;border-radius:20px;background:var(--teal)}
+.ai-box{background:rgba(74,240,216,0.035);border:1px solid rgba(74,240,216,0.17);border-radius:var(--rl);padding:1rem 1.3rem;margin-bottom:.85rem}
+.ai-lbl{font-size:.65rem;color:var(--teal);font-family:'IBM Plex Mono',monospace;letter-spacing:.07em;text-transform:uppercase;margin-bottom:.55rem;display:flex;align-items:center;gap:5px}
+.ai-body{font-family:'Literata',serif;font-size:.86rem;color:var(--text);line-height:1.7}
+.ai-body strong{color:var(--accent);font-family:'Syne',sans-serif}
+.av{background:var(--navy);border:1px solid var(--border);border-radius:var(--r);padding:.85rem;font-family:'IBM Plex Mono',monospace;font-size:.7rem;line-height:2;overflow-x:auto;white-space:pre}
+.aq{color:#60a5fa}.am{color:var(--accent)}.as{color:#c084fc}.ad{color:var(--text-dim)}
+.dc{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:1rem;transition:all .18s;position:relative;overflow:hidden}
+.dc::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--teal);opacity:0;transition:opacity .18s}
+.dc:hover{border-color:var(--border2);transform:translateY(-2px)}.dc:hover::before{opacity:1}
+.dn{font-weight:700;font-size:.92rem;margin-bottom:.28rem}
+.da{font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal);letter-spacing:.06em;margin-bottom:.5rem}
+.dd{font-size:.76rem;color:var(--text-muted);font-family:'Literata',serif;line-height:1.48;margin-bottom:.65rem}
+.gt{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:.65rem}
+.gtag{font-family:'IBM Plex Mono',monospace;font-size:.63rem;padding:2px 7px;border-radius:4px;background:rgba(74,240,216,0.07);color:var(--accent);border:1px solid rgba(74,240,216,0.17);cursor:pointer;transition:all .13s;text-decoration:none}
+.gtag:hover{background:rgba(74,240,216,0.17);color:#fff}
+.dl{display:flex;gap:7px;flex-wrap:wrap}
+.dlink{font-size:.65rem;color:var(--text-muted);text-decoration:none;font-family:'IBM Plex Mono',monospace;transition:color .13s}.dlink:hover{color:var(--accent)}
+.pub-r{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:.9rem 1.2rem;margin-bottom:.65rem;transition:border-color .15s;cursor:pointer}
+.pub-r:hover{border-color:var(--border2)}
+.pt{font-weight:600;font-size:.88rem;color:var(--accent2);line-height:1.35;margin-bottom:.28rem}
+.pau{font-size:.73rem;color:var(--text-muted);font-family:'Literata',serif;font-style:italic;margin-bottom:.28rem}
+.pm{display:flex;gap:.8rem;font-size:.65rem;font-family:'IBM Plex Mono',monospace;color:var(--text-dim);flex-wrap:wrap}
+.pj{color:var(--teal)}
+.pabs{font-size:.8rem;color:var(--text-muted);font-family:'Literata',serif;line-height:1.58;margin-top:.55rem;display:none}
+.pub-r.ex .pabs{display:block}
+.pc{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:.9rem 1.1rem;transition:border-color .15s}
+.pc:hover{border-color:var(--border2)}
+.ss{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:.85rem}
+.sb2{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:7px 11px;text-align:center}
+.sv{font-size:1rem;font-weight:700;color:var(--accent);font-family:'IBM Plex Mono',monospace}
+.sl2{font-size:.6rem;color:var(--text-muted);margin-top:2px;letter-spacing:.05em;text-transform:uppercase}
+.sm{font-family:'IBM Plex Mono',monospace;font-size:.73rem;padding:.45rem .75rem;border-radius:var(--r);margin-top:.45rem}
+.sm-ok{background:rgba(34,197,94,0.09);color:#4ade80;border:1px solid rgba(34,197,94,0.18)}
+.sm-err{background:rgba(239,68,68,0.09);color:#f87171;border:1px solid rgba(239,68,68,0.18)}
+.sm-info{background:rgba(74,240,216,0.06);color:var(--teal);border:1px solid var(--border2)}
+.sp{display:inline-block;width:14px;height:14px;border:2px solid rgba(74,240,216,0.18);border-top-color:var(--accent);border-radius:50%;animation:spin .65s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+.lb{height:2px;background:var(--surface2);border-radius:2px;overflow:hidden;margin-top:4px}
+.lf{height:100%;background:linear-gradient(90deg,var(--teal),var(--accent),var(--teal));background-size:200%;animation:sh 1.1s linear infinite}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.bex{font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:var(--text-dim);cursor:pointer;padding:5px 9px;border:1px dashed var(--border);border-radius:var(--r);background:var(--surface2);transition:all .15s;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px}
+.bex:hover{border-color:var(--teal);color:var(--teal);background:rgba(14,159,138,0.05)}
+.pwc{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:.85rem 1.1rem;display:flex;align-items:center;justify-content:space-between;gap:.9rem;margin-bottom:.65rem;transition:all .15s}
+.pwc:hover{border-color:var(--border2)}
+.af{border-top:1px solid var(--border);margin-top:4rem;padding:2.3rem 1.5rem;background:var(--surface)}
+.afi{max-width:1080px;margin:0 auto;display:flex;align-items:flex-start;gap:2.3rem;flex-wrap:wrap}
+.fi{flex:1;min-width:190px}
+.fi h3{font-size:.78rem;color:var(--accent);font-family:'IBM Plex Mono',monospace;letter-spacing:.06em;margin-bottom:.65rem;text-transform:uppercase}
+.fi p{font-size:.78rem;color:var(--text-muted);line-height:1.58;font-family:'Literata',serif;margin-bottom:.38rem}
+.ab{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rl);padding:1.3rem 1.5rem;min-width:260px;max-width:310px}
+.ahdr{display:flex;align-items:center;gap:8px;margin-bottom:1rem}
+.aico{width:32px;height:32px;border-radius:7px;background:rgba(74,240,216,0.08);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:.9rem}
+.at{font-size:.83rem;font-weight:700}.as2{font-size:.65rem;color:var(--text-dim);font-family:'IBM Plex Mono',monospace}
+.aa{display:flex;gap:7px;margin-top:.85rem}
+.an{font-size:.65rem;color:var(--text-dim);margin-top:.65rem;font-family:'IBM Plex Mono',monospace;line-height:1.5}
+.apg{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:.85rem}
+.fb{background:var(--navy);border-top:1px solid var(--border);padding:.75rem 1.5rem;text-align:center;font-size:.65rem;color:var(--text-dim);font-family:'IBM Plex Mono',monospace}
+.fb a{color:var(--teal);text-decoration:none}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--surface)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+@media(max-width:640px){.sc,.g2,.g3{grid-template-columns:1fr}.ss{grid-template-columns:repeat(2,1fr)}.hero h1{font-size:1.6rem}.ab{min-width:auto}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo-wrap">
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <circle cx="18" cy="18" r="17" fill="rgba(74,240,216,0.07)" stroke="rgba(74,240,216,0.2)" stroke-width="1"/>
+      <circle cx="18" cy="10" r="2.8" fill="#4af0d8" opacity=".9"/>
+      <circle cx="11" cy="21" r="2.8" fill="#4af0d8" opacity=".7"/>
+      <circle cx="25" cy="21" r="2.8" fill="#4af0d8" opacity=".7"/>
+      <circle cx="18" cy="29" r="2" fill="#1dbfa8" opacity=".55"/>
+      <line x1="18" y1="10" x2="11" y2="21" stroke="#4af0d8" stroke-width=".75" opacity=".4"/>
+      <line x1="18" y1="10" x2="25" y2="21" stroke="#4af0d8" stroke-width=".75" opacity=".4"/>
+      <line x1="11" y1="21" x2="18" y2="29" stroke="#4af0d8" stroke-width=".65" opacity=".3"/>
+      <line x1="25" y1="21" x2="18" y2="29" stroke="#4af0d8" stroke-width=".65" opacity=".3"/>
+      <line x1="11" y1="21" x2="25" y2="21" stroke="#1dbfa8" stroke-width=".55" opacity=".22"/>
+    </svg>
+    <div><div class="brand">NeuSynap DB</div><div class="tagline">Neurological Bioinformatics Platform</div></div>
+  </div>
+  <nav class="topnav">
+    <a onclick="st('blast')">BLAST</a><a onclick="st('diseases')">Diseases</a><a onclick="st('genes')">Genes</a>
+    <a onclick="st('proteins')">Proteins</a><a onclick="st('variants')">Variants</a>
+    <a onclick="st('pathways')">Pathways</a><a onclick="st('literature')">Literature</a><a onclick="st('tools')">Tools</a>
+  </nav>
+  <div class="ncbi-badge"><span class="dot"></span>NCBI Live</div>
+</header>
+
+<section class="hero">
+  <div class="hi">
+    <div class="chips">
+      <span class="chip c-t">NCBI E-utilities Live</span>
+      <span class="chip c-b">Real PubMed Search</span>
+      <span class="chip c-a">AI BLAST Analysis</span>
+    </div>
+    <h1>Neurological Disease<br><span>Bioinformatics Platform</span></h1>
+    <p>Real-time NCBI integration for neuro disease research. Live gene records, ClinVar variants, PubMed literature, protein data — AI-powered BLAST sequence analysis.</p>
+    <div class="stats-row">
+      <div><div class="sn">12,847</div><div class="sl">Neuro Gene Records</div></div>
+      <div><div class="sn">3,204</div><div class="sl">Disease Associations</div></div>
+      <div><div class="sn">89,412</div><div class="sl">Sequence Entries</div></div>
+      <div><div class="sn" id="pm-cnt">—</div><div class="sl">PubMed Articles</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tb active" onclick="st('blast')">🔬 BLAST</button>
+    <button class="tb" onclick="st('diseases')">🧠 Diseases</button>
+    <button class="tb" onclick="st('genes')">🧬 Genes</button>
+    <button class="tb" onclick="st('proteins')">⚙️ Proteins</button>
+    <button class="tb" onclick="st('variants')">🔀 Variants</button>
+    <button class="tb" onclick="st('pathways')">🗺️ Pathways</button>
+    <button class="tb" onclick="st('literature')">📄 Literature</button>
+    <button class="tb" onclick="st('tools')">🛠️ Tools</button>
+  </div>
+</div>
+
+<main class="main">
+
+<!-- BLAST -->
+<div class="tp active" id="panel-blast">
+  <div class="sh"><h2>BLAST Sequence Search</h2><p>AI-powered sequence analysis + NCBI BLAST submission. Real BLAST results open on NCBI; Claude AI provides instant neurological context while BLAST runs.</p></div>
+  <div class="card">
+    <div class="ct">▶ Query Sequence</div>
+    <div class="fr">
+      <label>FASTA or raw sequence</label>
+      <textarea id="bseq" placeholder=">query_seq&#10;MDVFMKGLSKAKEGVVAAA..."></textarea>
+      <div style="margin-top:6px;font-size:.63rem;color:var(--text-dim);font-family:'IBM Plex Mono',monospace;margin-bottom:3px;">QUICK LOAD:</div>
+      <span class="bex" onclick="loadEx('snca')">SNCA — α-Synuclein (140 aa) · Parkinson's key protein</span>
+      <span class="bex" onclick="loadEx('mapt')">MAPT — Tau microtubule-binding domain · Alzheimer's / FTD</span>
+      <span class="bex" onclick="loadEx('sod1')">SOD1 — Superoxide dismutase (154 aa) · ALS-associated</span>
+    </div>
+    <div class="sc">
+      <div><label>Program</label><select id="bprog"><option value="blastn">BLASTN — nucleotide</option><option value="blastp" selected>BLASTP — protein</option><option value="blastx">BLASTX — translated</option><option value="tblastn">TBLASTN</option></select></div>
+      <div><label>Database</label><select id="bdb"><option value="nr">nr — Non-redundant</option><option value="refseq_protein" selected>RefSeq Protein</option><option value="swissprot">Swiss-Prot</option><option value="pdb">PDB</option></select></div>
+      <div><label>Organism</label><select id="borg"><option value="Homo sapiens[Organism]" selected>Homo sapiens</option><option value="">All organisms</option><option value="Mus musculus[Organism]">Mus musculus</option><option value="Rattus norvegicus[Organism]">Rattus norvegicus</option></select></div>
+      <div><label>E-value</label><select id="beval"><option value="0.001">0.001</option><option value="0.01" selected>0.01</option><option value="0.1">0.1</option></select></div>
+    </div>
+    <div class="br">
+      <button class="btn bp" onclick="runBlast()">🔬 Run BLAST + AI Analysis</button>
+      <button class="btn bo" onclick="openNCBI()">↗ Open on NCBI BLAST</button>
+      <button class="btn bo bs" onclick="clearBlast()">✕ Clear</button>
+    </div>
+  </div>
+  <div id="bstatus"></div>
+  <div id="boutput"></div>
+</div>
+
+<!-- DISEASES -->
+<div class="tp" id="panel-diseases">
+  <div class="sh"><h2>NeuSynap Disease Database</h2><p>Curated neurological disease records with live NCBI Gene, OMIM, and PubMed links.</p></div>
+  <div class="sb"><input type="search" id="dq" placeholder="Search disease, gene, OMIM…" oninput="fDis()"><button class="btn bp" onclick="fDis()">Search</button></div>
+  <div class="fr-row" id="dcf">
+    <button class="fc active" onclick="sDCat(this,'all')">All</button>
+    <button class="fc" onclick="sDCat(this,'neurodegeneration')">Neurodegeneration</button>
+    <button class="fc" onclick="sDCat(this,'movement')">Movement</button>
+    <button class="fc" onclick="sDCat(this,'synaptic')">Synaptic</button>
+    <button class="fc" onclick="sDCat(this,'epilepsy')">Epilepsy</button>
+    <button class="fc" onclick="sDCat(this,'demyelinating')">Demyelinating</button>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(252px,1fr));gap:.85rem;" id="dgrid"></div>
+</div>
+
+<!-- GENES -->
+<div class="tp" id="panel-genes">
+  <div class="sh"><h2>NCBI Gene Explorer — Live</h2><p>Real-time gene search via NCBI Gene E-utilities. Results are fetched live from NCBI databases.</p></div>
+  <div class="sb"><input type="search" id="gq" placeholder="SNCA, MAPT, APP, SOD1, HTT…" onkeydown="if(event.key==='Enter')sGenes()"><button class="btn bp" onclick="sGenes()">Search NCBI Gene</button></div>
+  <div class="fr-row">
+    <button class="fc active" onclick="qGene(this,'alzheimer neurodegeneration homo sapiens')">Alzheimer's</button>
+    <button class="fc" onclick="qGene(this,'parkinson alpha-synuclein homo sapiens')">Parkinson's</button>
+    <button class="fc" onclick="qGene(this,'ALS amyotrophic lateral sclerosis homo sapiens')">ALS</button>
+    <button class="fc" onclick="qGene(this,'huntington neurodegeneration homo sapiens')">Huntington's</button>
+    <button class="fc" onclick="qGene(this,'multiple sclerosis demyelinating homo sapiens')">MS</button>
+    <button class="fc" onclick="qGene(this,'epilepsy sodium channel neuron homo sapiens')">Epilepsy</button>
+  </div>
+  <div id="gstatus"></div>
+  <div style="overflow-x:auto;"><table class="rt"><thead><tr><th>Symbol</th><th>Name</th><th>Chr</th><th>Summary</th><th>Gene ID</th><th>Links</th></tr></thead><tbody id="gtbody"></tbody></table></div>
+</div>
+
+<!-- PROTEINS -->
+<div class="tp" id="panel-proteins">
+  <div class="sh"><h2>Protein Database — NCBI Live</h2><p>Real-time protein search via NCBI Protein E-utilities.</p></div>
+  <div class="sb"><input type="search" id="pq" placeholder="alpha-synuclein, tau, TDP-43…" onkeydown="if(event.key==='Enter')sProts()"><button class="btn bp" onclick="sProts()">Search</button></div>
+  <div class="fr-row">
+    <button class="fc active" onclick="qProt(this,'alpha-synuclein Parkinson homo sapiens')">α-Synuclein</button>
+    <button class="fc" onclick="qProt(this,'tau protein Alzheimer homo sapiens')">Tau</button>
+    <button class="fc" onclick="qProt(this,'TDP-43 ALS homo sapiens')">TDP-43</button>
+    <button class="fc" onclick="qProt(this,'huntingtin neurodegeneration homo sapiens')">Huntingtin</button>
+    <button class="fc" onclick="qProt(this,'amyloid precursor protein APP homo sapiens')">APP / Aβ</button>
+    <button class="fc" onclick="qProt(this,'SOD1 superoxide dismutase homo sapiens')">SOD1</button>
+  </div>
+  <div id="pstatus"></div>
+  <div id="pgrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:.85rem;"></div>
+</div>
+
+<!-- VARIANTS -->
+<div class="tp" id="panel-variants">
+  <div class="sh"><h2>ClinVar Variant Browser — Live</h2><p>Live queries to NCBI ClinVar for pathogenic variants in neurological disease genes.</p></div>
+  <div class="sb"><input type="search" id="vq" placeholder="SNCA, SOD1, MAPT, PSEN1, HTT…" onkeydown="if(event.key==='Enter')sVars()"><button class="btn bp" onclick="sVars()">Search ClinVar</button><a href="https://www.ncbi.nlm.nih.gov/clinvar/?term=neurological" target="_blank" class="btn bo bs">↗ ClinVar</a></div>
+  <div id="vstatus"></div>
+  <div style="overflow-x:auto;"><table class="rt"><thead><tr><th>ID</th><th>Variant Name</th><th>Gene</th><th>Significance</th><th>Condition</th><th>View</th></tr></thead><tbody id="vtbody"></tbody></table></div>
+</div>
+
+<!-- PATHWAYS -->
+<div class="tp" id="panel-pathways">
+  <div class="sh"><h2>Neurological Pathways</h2><p>KEGG and Reactome pathways for neurodegeneration and synaptic disease mechanisms.</p></div>
+  <div class="fr-row">
+    <button class="fc active" onclick="lPw('all',this)">All</button>
+    <button class="fc" onclick="lPw('signaling',this)">Signaling</button>
+    <button class="fc" onclick="lPw('apoptosis',this)">Apoptosis</button>
+    <button class="fc" onclick="lPw('protein',this)">Protein Processing</button>
+    <button class="fc" onclick="lPw('mitochondria',this)">Mitochondrial</button>
+    <button class="fc" onclick="lPw('synapse',this)">Synaptic</button>
+  </div>
+  <div id="pwlist"></div>
+</div>
+
+<!-- LITERATURE -->
+<div class="tp" id="panel-literature">
+  <div class="sh"><h2>PubMed Literature — Live Search</h2><p>Real-time NCBI PubMed search via E-utilities API. Results link directly to full PubMed records.</p></div>
+  <div class="sb"><input type="search" id="lq" placeholder="tau phosphorylation, synuclein aggregation, ALS TDP-43…" onkeydown="if(event.key==='Enter')sPub()"><button class="btn bp" onclick="sPub()">Search PubMed</button></div>
+  <div class="fr-row">
+    <button class="fc active" onclick="setPF(this,'')">All Years</button>
+    <button class="fc" onclick="setPF(this,'1')">Last Year</button>
+    <button class="fc" onclick="setPF(this,'5')">5 Years</button>
+    <button class="fc" onclick="setPF(this,'10')">10 Years</button>
+    <button class="fc" onclick="setPF(this,'review')">Reviews</button>
+    <button class="fc" onclick="setPF(this,'free')">Free Full Text</button>
+  </div>
+  <div id="lstatus"></div>
+  <div id="lresults"><p style="color:var(--text-muted);font-family:'Literata',serif;font-size:.86rem;margin-top:.4rem;">Enter a query to search PubMed live.</p></div>
+</div>
+
+<!-- TOOLS -->
+<div class="tp" id="panel-tools">
+  <div class="sh"><h2>Sequence Analysis Toolkit</h2><p>Local bioinformatics tools for sequence analysis.</p></div>
+  <div class="g2">
+    <div class="card"><div class="ct">🧮 Sequence Stats</div><div class="fr"><label>Sequence</label><textarea id="ts" placeholder="Nucleotide or protein…" style="min-height:75px;"></textarea></div><button class="btn bp bs" onclick="cStats()">Calculate</button><div id="tsout"></div></div>
+    <div class="card"><div class="ct">🔄 Reverse Complement</div><div class="fr"><label>DNA Sequence</label><textarea id="trc" placeholder="ATGGCAGACGCTCGA…" style="min-height:75px;"></textarea></div><button class="btn bp bs" onclick="cRC()">Convert</button><div id="trcout"></div></div>
+    <div class="card"><div class="ct">⚗️ GC Content</div><div class="fr"><label>DNA/RNA Sequence</label><textarea id="tgc" placeholder="Sequence…" style="min-height:75px;"></textarea></div><button class="btn bp bs" onclick="cGC()">Analyze</button><div id="tgcout"></div></div>
+    <div class="card"><div class="ct">🧬 ORF Finder</div><div class="fr"><label>Nucleotide Sequence</label><textarea id="torf" placeholder="DNA/mRNA…" style="min-height:75px;"></textarea></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.85rem;"><div><label>Min (aa)</label><input id="torfm" value="30"></div><div><label>Frame</label><select id="torff"><option value="all">All +frames</option><option value="1">+1</option><option value="2">+2</option><option value="3">+3</option></select></div></div><button class="btn bp bs" onclick="cORF()">Find ORFs</button><div id="torfout"></div></div>
+  </div>
+  <div class="card"><div class="ct">🌐 External Resources</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;">
+      <a href="https://blast.ncbi.nlm.nih.gov" target="_blank" class="bo btn bs" style="justify-content:center;">↗ NCBI BLAST</a>
+      <a href="https://www.uniprot.org" target="_blank" class="bo btn bs" style="justify-content:center;">↗ UniProt</a>
+      <a href="https://www.rcsb.org" target="_blank" class="bo btn bs" style="justify-content:center;">↗ RCSB PDB</a>
+      <a href="https://www.kegg.jp" target="_blank" class="bo btn bs" style="justify-content:center;">↗ KEGG</a>
+      <a href="https://www.omim.org" target="_blank" class="bo btn bs" style="justify-content:center;">↗ OMIM</a>
+      <a href="https://www.ensembl.org" target="_blank" class="bo btn bs" style="justify-content:center;">↗ Ensembl</a>
+      <a href="https://reactome.org" target="_blank" class="bo btn bs" style="justify-content:center;">↗ Reactome</a>
+      <a href="https://www.ncbi.nlm.nih.gov/clinvar" target="_blank" class="bo btn bs" style="justify-content:center;">↗ ClinVar</a>
+      <a href="https://www.ncbi.nlm.nih.gov/snp" target="_blank" class="bo btn bs" style="justify-content:center;">↗ dbSNP</a>
+      <a href="https://www.genecards.org" target="_blank" class="bo btn bs" style="justify-content:center;">↗ GeneCards</a>
+      <a href="https://string-db.org" target="_blank" class="bo btn bs" style="justify-content:center;">↗ STRING DB</a>
+      <a href="https://clinicalgenome.org" target="_blank" class="bo btn bs" style="justify-content:center;">↗ ClinGen</a>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer class="af">
+  <div class="afi">
+    <div class="fi">
+      <h3>NeuSynap DB v3.0</h3>
+      <p>Live NCBI integration for neurological disease bioinformatics. Gene, protein, variant, and literature data fetched in real-time via NCBI E-utilities API.</p>
+      <p>BLAST powered by NCBI BLAST API + Claude AI sequence interpretation. PubMed returns live NCBI results.</p>
+      <div style="margin-top:.9rem;font-family:'IBM Plex Mono',monospace;font-size:.68rem;">
+        <div style="color:var(--text-dim);letter-spacing:.04em;margin-bottom:.35rem;">LIVE API ENDPOINTS</div>
+        <div style="background:var(--surface2);padding:8px 11px;border-radius:6px;border:1px solid var(--border);color:var(--teal);line-height:2;">eutils.ncbi.nlm.nih.gov/entrez/eutils/<br>blast.ncbi.nlm.nih.gov/blast/Blast.cgi<br>api.anthropic.com/v1/messages</div>
+      </div>
+    </div>
+    <div class="ab">
+      <div class="ahdr"><div class="aico">🔐</div><div><div class="at">Admin Portal</div><div class="as2">NeuSynap DB · Restricted</div></div></div>
+      <div id="aform">
+        <div class="fr"><label>Username</label><input type="text" id="au" placeholder="admin@neusynap.org" autocomplete="username"></div>
+        <div class="fr"><label>Password</label><input type="password" id="ap" placeholder="••••••••" onkeydown="if(event.key==='Enter')aLogin()"></div>
+        <div class="fr"><label>2FA Code (TOTP)</label><input type="text" id="a2" placeholder="6-digit code" maxlength="6" style="letter-spacing:.14em;"></div>
+        <div class="aa"><button class="btn bp" style="flex:1;" onclick="aLogin()">🔐 Login</button><button class="btn bo bs" onclick="aReset()">Reset</button></div>
+        <div id="amsg" class="an"></div>
+        <p class="an">⚠ Unauthorized access is monitored and logged.</p>
+      </div>
+      <div id="apanel" style="display:none;">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:.85rem;"><span class="dot"></span><span style="font-size:.78rem;color:var(--success);font-family:'IBM Plex Mono',monospace;">Session Active</span></div>
+        <div class="apg">
+          <button class="btn bo bs" style="justify-content:center;" onclick="adm('Manage Genes')">🧬 Genes</button>
+          <button class="btn bo bs" style="justify-content:center;" onclick="adm('Curate Variants')">🔀 Variants</button>
+          <button class="btn bo bs" style="justify-content:center;" onclick="adm('User Accounts')">👥 Users</button>
+          <button class="btn bo bs" style="justify-content:center;" onclick="adm('Sync Logs')">📋 Logs</button>
+          <button class="btn bo bs" style="justify-content:center;" onclick="adm('Export Data')">📤 Export</button>
+          <button class="btn bo bs" style="justify-content:center;" onclick="adm('System Config')">⚙️ Config</button>
+        </div>
+        <div style="font-size:.68rem;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;margin-bottom:.75rem;">NCBI Sync: <span style="color:var(--success);">● Live</span></div>
+        <button class="btn bd bs" style="width:100%;justify-content:center;" onclick="aLogout()">↩ Logout</button>
+      </div>
+    </div>
+  </div>
+</footer>
+<div class="fb">NeuSynap DB · Live <a href="https://www.ncbi.nlm.nih.gov" target="_blank">NCBI</a> Integration · Data from <a href="https://www.uniprot.org" target="_blank">UniProt</a> · <a href="https://www.kegg.jp" target="_blank">KEGG</a> · For research use</div>
+
+<script>
+// ── YOUR BACKEND URL ─────────────────────────────────────────
+// After you deploy to Render.com, paste your URL here.
+// It will look like: https://neusynap-backend.onrender.com
+const API = window.NEUSYNAP_API || 'https://YOUR-APP-NAME.onrender.com';
+
+// Legacy NCBI direct (still used as fallback)
+const EU='https://eutils.ncbi.nlm.nih.gov/entrez/eutils/';
+const TL='&tool=NeuSynapDB&email=contact@neusynap.org';
+
+// TAB
+function st(id){
+  document.querySelectorAll('.tp').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tb,.topnav a').forEach(b=>b.classList.remove('active'));
+  const p=document.getElementById('panel-'+id);if(p)p.classList.add('active');
+  document.querySelectorAll('.tb').forEach(b=>{if(b.textContent.toLowerCase().includes(id.slice(0,4)))b.classList.add('active')});
+  document.querySelectorAll('.topnav a').forEach(a=>{if(a.textContent.toLowerCase().includes(id.slice(0,4)))a.classList.add('active')});
+}
+function ss(el,t,m){const e=document.getElementById(el);if(!e)return;e.innerHTML=`<div class="sm sm-${t}">${m}</div>`;}
+function sl(el,m='Fetching from NCBI…'){const e=document.getElementById(el);if(!e)return;e.innerHTML=`<div class="sm sm-info"><span class="sp"></span> ${m}<div class="lb"><div class="lf"></div></div></div>`;}
+
+// SEQUENCES
+const SQ={
+  snca:'>SNCA_Human alpha-synuclein [Homo sapiens]\nMDVFMKGLSKAKEGVVAAAEKTKQGVAEAAGKTKEGVLYVGSKTKEGVVHGVATVAEKTKEQVTNVGGAVVTGVTAVAQKTVEGAGSIAAATGFVKKDQLGKNEEGAPQEGILEDMPVDPDNEAYEMPSEEGYQDYEPEA',
+  mapt:'>MAPT_Human Tau_microtubule_binding [Homo sapiens]\nMAEPRQEFEVMEDHAGTYGLGDRKDQGGYTMHQDQEGDTDAGLKESPLQTPTEDGSEEPGSETSDAKSTPTAEDVTAPLVDEGAPGKQAAA',
+  sod1:'>SOD1_Human superoxide_dismutase [Homo sapiens]\nMATKAVCVLKGDGPVQGTIHFEAKGDTVVVTGSITGLTEGGPHGPHFNPLSRKHGGPKDEERHVGDLGNVTADKNGVAIVDIVDPLISLSGEYSIIGRTMVVHEKPDDLGRGGNEESTKTGNAGSRLACGVIGIAK'
+};
+function loadEx(k){document.getElementById('bseq').value=SQ[k];}
+function openNCBI(){
+  const s=document.getElementById('bseq').value.trim();
+  if(!s){alert('Enter a sequence first.');return;}
+  window.open(`https://blast.ncbi.nlm.nih.gov/blast/Blast.cgi?PAGE_TYPE=BlastSearch&PROGRAM=${document.getElementById('bprog').value}&DATABASE=${document.getElementById('bdb').value}&QUERY=${encodeURIComponent(s)}`,'_blank');
+}
+
+async function runBlast(){
+  const seq=document.getElementById('bseq').value.trim();
+  if(!seq){alert('Enter a sequence.');return;}
+  const prog=document.getElementById('bprog').value;
+  const db=document.getElementById('bdb').value;
+  const org=document.getElementById('borg').value;
+  const ev=document.getElementById('beval').value;
+  const clean=seq.replace(/^>.*$/gm,'').replace(/\s/g,'').toUpperCase();
+  const isP=/[EDFHIKLMPQRVWY]/.test(clean)&&clean.length<2000;
+
+  sl('bstatus','Running AI analysis + submitting to NCBI BLAST via server…');
+  document.getElementById('boutput').innerHTML='';
+
+  // 1. AI Analysis via backend (keeps API key safe)
+  let aiHTML='';
+  try{
+    const r=await fetch(`${API}/ai/analyze`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({sequence:clean,type:isP?'protein':'nucleotide'})
+    });
+    const p=await r.json();
+    if(!p.error){
+      aiHTML=`<div class="ai-box"><div class="ai-lbl">🤖 Claude AI Sequence Analysis</div><div class="ai-body">
+        <strong>${p.protein_name||'Unknown'}</strong> · Gene: <strong>${p.gene_symbol||'?'}</strong> · ${p.organism||'—'}<br>
+        <span style="color:var(--warn);font-size:.74rem;font-family:'IBM Plex Mono',monospace;">Disease relevance:</span> ${p.disease_relevance||'—'}<br>
+        <span style="color:var(--teal);font-size:.74rem;font-family:'IBM Plex Mono',monospace;">Key features:</span> ${p.key_features||'—'}<br>
+        <span style="color:var(--accent2);font-size:.74rem;font-family:'IBM Plex Mono',monospace;">Homologs:</span> ${p.homologs||'—'}<br>
+        <span style="font-size:.68rem;color:var(--text-dim);font-family:'IBM Plex Mono',monospace;">Confidence: ${p.confidence}</span>
+      </div></div>`;
+    }
+  }catch(e){
+    aiHTML=`<div class="ai-box"><div class="ai-lbl">🤖 AI Analysis</div><div class="ai-body" style="color:var(--text-dim);">Connect your backend server to enable AI analysis.</div></div>`;
+  }
+
+  // 2. BLAST via backend server (no CORS issues!)
+  let blastHTML='';
+  try{
+    ss('bstatus','info','<span class="sp"></span> BLAST running on server — polling NCBI (this takes 30–90 seconds)…');
+    const r=await fetch(`${API}/blast`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({sequence:clean,program:prog,database:db,organism:org,evalue:ev,hitlist:'20'})
+    });
+    const data=await r.json();
+
+    if(data.status==='success'){
+      blastHTML=renderBlastData(data);
+    } else if(data.status==='timeout'||data.rid){
+      blastHTML=`<div class="card"><div class="ct">🔬 BLAST Submitted</div>
+        <div class="sm sm-ok" style="margin-bottom:.9rem;">RID: <strong>${data.rid}</strong></div>
+        <p style="color:var(--text-muted);font-size:.83rem;font-family:'Literata',serif;margin-bottom:.9rem;">${data.message||'Results ready on NCBI.'}</p>
+        <div class="br"><a href="${data.ncbi_url}" target="_blank" class="btn bp">↗ View Results on NCBI</a></div>
+      </div>`;
+    } else {
+      blastHTML=`<div class="sm sm-err">BLAST error: ${data.error||'Unknown error'}</div>`;
+    }
+  }catch(e){
+    // Backend not connected yet — show NCBI direct link
+    const url=`https://blast.ncbi.nlm.nih.gov/blast/Blast.cgi?PAGE_TYPE=BlastSearch&PROGRAM=${prog}&DATABASE=${db}&QUERY=${encodeURIComponent(clean)}`;
+    blastHTML=`<div class="card"><div class="ct">🔗 Backend Not Connected Yet</div>
+      <div class="sm sm-info" style="margin-bottom:.9rem;">⚠ Your backend server is not set up yet. Follow the deployment guide to enable full BLAST. For now, use NCBI directly:</div>
+      <div class="br"><a href="${url}" target="_blank" class="btn bp">↗ Run on NCBI BLAST</a></div>
+      <div class="ss" style="margin-top:.9rem;">
+        <div class="sb2"><div class="sv">${clean.length}</div><div class="sl2">${isP?'aa':'bp'}</div></div>
+        <div class="sb2"><div class="sv">${prog}</div><div class="sl2">Program</div></div>
+        <div class="sb2"><div class="sv">${db}</div><div class="sl2">Database</div></div>
+        <div class="sb2"><div class="sv">${ev}</div><div class="sl2">E-value</div></div>
+      </div>
+    </div>`;
+  }
+
+  ss('bstatus','ok','✓ Analysis complete.');
+  document.getElementById('boutput').innerHTML=aiHTML+blastHTML;
+  document.getElementById('boutput').scrollIntoView({behavior:'smooth'});
+}
+
+function renderBlastData(data){
+  if(!data.hits||!data.hits.length)
+    return `<div class="sm sm-info">No significant hits found. <a href="${data.ncbi_url}" target="_blank" style="color:var(--accent);">View on NCBI ↗</a></div>`;
+
+  return `<div class="card">
+    <div class="ct">🔍 BLAST Results — ${data.total_hits} Hits · ${data.program} vs ${data.database}</div>
+    <div class="br" style="margin-bottom:.9rem;">
+      <a href="${data.ncbi_url}" target="_blank" class="btn bo bs">↗ Full Report on NCBI</a>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--text-dim);">Query: ${data.query_len} ${data.program==='blastn'?'bp':'aa'}</span>
+    </div>
+    ${data.hits.map(h=>`<div class="bh">
+      <div class="bh-top">
+        <div>
+          <div class="hacc"><a href="${h.ncbi_url}" target="_blank">${h.accession}</a> · <span style="color:var(--text-muted);font-size:.68rem;">${h.sciname||''}</span></div>
+          <div class="hdesc">${(h.title||'').substring(0,85)}${h.title&&h.title.length>85?'…':''}</div>
+        </div>
+        <span class="bge ${h.identity>90?'bg-g':h.identity>60?'bg-a':'bg-r'}">${h.identity}% id</span>
+      </div>
+      <div class="hsc">
+        <span>Score: <span>${h.score} bits</span></span>
+        <span>E-val: <span>${h.evalue}</span></span>
+        <span>Align: <span>${h.align_len} aa</span></span>
+        <span>Coverage: <span>${h.coverage}%</span></span>
+        <span>Gaps: <span>${h.gaps}</span></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:7px;margin-top:.35rem;">
+        <div class="pb"><div class="pf" style="width:${h.identity}%;background:${h.identity>90?'var(--success)':h.identity>60?'var(--warn)':'var(--danger)'}"></div></div>
+        <span style="font-size:.68rem;font-family:'IBM Plex Mono',monospace;">${h.identity}%</span>
+        <a href="${h.ncbi_url}" target="_blank" class="btn bo bs" style="font-size:.65rem;padding:2px 8px;margin-left:auto;">NCBI ↗</a>
+      </div>
+    </div>`).join('')}
+    ${data.hits[0]&&data.hits[0].qseq?`
+    <div style="margin-top:1rem;">
+      <div class="ct" style="margin-bottom:.5rem;">Top Hit — Pairwise Alignment</div>
+      <div class="av"><span class="ad">Score=${data.hits[0].score} bits  E-value=${data.hits[0].evalue}  Identity=${data.hits[0].identity}%  Align=${data.hits[0].align_len}aa</span>
+
+<span class="ad">Query ${String(data.hits[0].query_from).padStart(5)} </span><span class="aq">${(data.hits[0].qseq||'').substring(0,60)}</span> <span class="ad">${data.hits[0].query_to}</span>
+      <span style="display:inline-block;width:46px"></span><span class="am">${(data.hits[0].midline||'').substring(0,60)}</span>
+<span class="ad">Sbjct ${String(data.hits[0].hit_from).padStart(5)} </span><span class="as">${(data.hits[0].hseq||'').substring(0,60)}</span> <span class="ad">${data.hits[0].hit_to}</span></div>
+    </div>`:''}
+  </div>`;
+}
+
+function renderBlastJSON(jd,rid){
+  try{
+    const its=jd.BlastOutput2[0].report.results.iterations[0];
+    const hits=(its.hits||[]);
+    if(!hits.length) return `<div class="sm sm-info">No significant hits found. <a href="https://blast.ncbi.nlm.nih.gov/blast/Blast.cgi?CMD=Get&RID=${rid}" target="_blank" style="color:var(--accent);">View on NCBI ↗</a></div>`;
+    return `<div class="card"><div class="ct">🔍 BLAST Results — ${hits.length} Hits (RID: ${rid})</div>
+      <div class="br" style="margin-bottom:.9rem;"><a href="https://blast.ncbi.nlm.nih.gov/blast/Blast.cgi?CMD=Get&RID=${rid}" target="_blank" class="btn bo bs">↗ Full Report on NCBI</a></div>
+      ${hits.slice(0,8).map(h=>{
+        const hsp=h.hsps[0];const desc=h.description[0];
+        const id=Math.round((hsp.identity/hsp.align_len)*100);
+        return `<div class="bh">
+          <div class="bh-top">
+            <div><div class="hacc"><a href="https://www.ncbi.nlm.nih.gov/protein/${desc.accession}" target="_blank">${desc.accession}</a></div>
+            <div class="hdesc">${(desc.title||'').substring(0,80)}${desc.title.length>80?'…':''}</div></div>
+            <span class="bge ${id>90?'bg-g':id>60?'bg-a':'bg-r'}">${id}% identity</span>
+          </div>
+          <div class="hsc">
+            <span>Score: <span>${hsp.bit_score.toFixed(0)} bits</span></span>
+            <span>E-val: <span>${hsp.evalue}</span></span>
+            <span>Align: <span>${hsp.align_len} aa</span></span>
+            <span>Gaps: <span>${hsp.gaps}</span></span>
+          </div>
+          <div style="display:flex;align-items:center;gap:7px;margin-top:.35rem;">
+            <div class="pb"><div class="pf" style="width:${id}%;background:${id>90?'var(--success)':id>60?'var(--warn)':'var(--danger)'}"></div></div>
+            <span style="font-size:.68rem;font-family:'IBM Plex Mono',monospace;">${id}%</span>
+          </div>
+        </div>`;
+      }).join('')}
+      ${hits[0]?`<div style="margin-top:.9rem;"><div class="ct" style="margin-bottom:.6rem;">Top Hit Alignment</div>
+        <div class="av">${renderAlign(hits[0])}</div></div>`:''}
+    </div>`;
+  }catch{return renderBlastRID(rid,'','','');}
+}
+
+function renderAlign(hit){
+  try{
+    const h=hit.hsps[0];
+    const q=(h.qseq||'').substring(0,60);const m=(h.midline||'').substring(0,60);const s=(h.hseq||'').substring(0,60);
+    return `<span class="ad">Score=${h.bit_score.toFixed(0)}  E=${h.evalue}  Identity=${h.identity}/${h.align_len}</span>\n\n<span class="ad">Query ${String(h.query_from).padStart(5)} </span><span class="aq">${q}</span> <span class="ad">${h.query_from+q.length-1}</span>\n       <span style="display:inline-block;width:45px"></span><span class="am">${m}</span>\n<span class="ad">Sbjct ${String(h.hit_from).padStart(5)} </span><span class="as">${s}</span> <span class="ad">${h.hit_from+s.length-1}</span>`;
+  }catch{return '';}
+}
+
+function renderBlastRID(rid,seq,prog,db){
+  return `<div class="card"><div class="ct">🔬 BLAST Submitted</div>
+    ${rid?`<div class="sm sm-ok" style="margin-bottom:.9rem;">RID: <strong>${rid}</strong></div>`:''}
+    <p style="color:var(--text-muted);font-size:.83rem;font-family:'Literata',serif;margin-bottom:.9rem;">BLAST job submitted. View results on NCBI.</p>
+    <div class="br">${rid?`<a href="https://blast.ncbi.nlm.nih.gov/blast/Blast.cgi?CMD=Get&RID=${rid}" target="_blank" class="btn bp">↗ View Results on NCBI</a>`:''}<button class="btn bo" onclick="openNCBI()">↗ Re-run on NCBI</button></div>
+  </div>`;
+}
+function clearBlast(){document.getElementById('bseq').value='';document.getElementById('bstatus').innerHTML='';document.getElementById('boutput').innerHTML='';}
+
+// GENES — NCBI Live
+async function sGenes(){
+  const q=(document.getElementById('gq').value||'').trim();
+  if(!q){ss('gstatus','err','Enter a gene or term.');return;}
+  await fGenes(q+' AND Homo sapiens[Organism]');
+}
+async function qGene(el,q){
+  document.querySelectorAll('#panel-genes .fc').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');await fGenes(q+'[Organism:noexp]'.includes('[Organism')?q:q+' AND Homo sapiens[Organism]');
+}
+async function fGenes(q){
+  sl('gstatus','Searching NCBI Gene via server…');
+  document.getElementById('gtbody').innerHTML='';
+  try{
+    const r=await fetch(`${API}/ncbi/gene?term=${encodeURIComponent(q)}&retmax=20`);
+    const data=await r.json();
+    if(!data.results||!data.results.length){ss('gstatus','err','No genes found.');return;}
+    document.getElementById('gtbody').innerHTML=data.results.map(g=>`<tr>
+      <td><strong style="color:var(--accent);font-family:'IBM Plex Mono',monospace;">${g.name||'—'}</strong></td>
+      <td style="font-size:.8rem;">${(g.description||'—').substring(0,45)}</td>
+      <td style="font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--teal);">${g.chromosome||'—'}</td>
+      <td style="font-size:.75rem;color:var(--text-muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;">${(g.summary||'—').substring(0,70)}…</td>
+      <td><a href="https://www.ncbi.nlm.nih.gov/gene/${g.uid}" target="_blank" style="font-family:'IBM Plex Mono',monospace;">${g.uid}</a></td>
+      <td style="display:flex;gap:4px;flex-wrap:wrap;">
+        <a href="https://www.ncbi.nlm.nih.gov/gene/${g.uid}" target="_blank" class="btn bo bs" style="padding:3px 7px;font-size:.63rem;">NCBI</a>
+        <a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene=${g.name}" target="_blank" class="btn bo bs" style="padding:3px 7px;font-size:.63rem;">GeneCards</a>
+      </td>
+    </tr>`).join('');
+    ss('gstatus','ok',`✓ ${data.results.length} live gene records from NCBI (total: ${parseInt(data.total||0).toLocaleString()}).`);
+  }catch(e){
+    // Fallback to direct NCBI if backend not set up
+    try{
+      const sr=await fetch(`${EU}esearch.fcgi?db=gene&term=${encodeURIComponent(q)}&retmax=20&retmode=json${TL}`);
+      const sd=await sr.json();
+      const ids=sd.esearchresult.idlist;
+      if(!ids.length){ss('gstatus','err','No genes found.');return;}
+      const smr=await fetch(`${EU}esummary.fcgi?db=gene&id=${ids.join(',')}&retmode=json${TL}`);
+      const smd=await smr.json();
+      document.getElementById('gtbody').innerHTML=smd.result.uids.map(uid=>{
+        const g=smd.result[uid];if(!g||g.status==='discontinued')return '';
+        return `<tr><td><strong style="color:var(--accent);font-family:'IBM Plex Mono',monospace;">${g.name||'—'}</strong></td><td style="font-size:.8rem;">${(g.description||'—').substring(0,45)}</td><td style="font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--teal);">${g.chromosome||'—'}</td><td style="font-size:.75rem;color:var(--text-muted);">${(g.summary||'—').substring(0,70)}…</td><td><a href="https://www.ncbi.nlm.nih.gov/gene/${uid}" target="_blank">${uid}</a></td><td><a href="https://www.ncbi.nlm.nih.gov/gene/${uid}" target="_blank" class="btn bo bs" style="padding:3px 7px;font-size:.63rem;">NCBI</a></td></tr>`;
+      }).join('');
+      ss('gstatus','ok',`✓ ${smd.result.uids.length} gene records (direct NCBI).`);
+    }catch(e2){ss('gstatus','err',`Error: ${e2.message}`);}
+  }
+}
+
+// PROTEINS — NCBI Live
+async function sProts(){
+  const q=(document.getElementById('pq').value||'').trim();
+  if(!q){ss('pstatus','err','Enter a protein name.');return;}
+  await fProts(q+' AND Homo sapiens[Organism]');
+}
+async function qProt(el,q){
+  document.querySelectorAll('#panel-proteins .fc').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');await fProts(q+' AND refseq[filter]');
+}
+async function fProts(q){
+  sl('pstatus','Searching NCBI Protein…');
+  document.getElementById('pgrid').innerHTML='';
+  try{
+    const sr=await fetch(`${EU}esearch.fcgi?db=protein&term=${encodeURIComponent(q)}&retmax=12&retmode=json${TL}`);
+    const sd=await sr.json();
+    const ids=sd.esearchresult.idlist;
+    if(!ids.length){ss('pstatus','err','No protein records found.');return;}
+    const smr=await fetch(`${EU}esummary.fcgi?db=protein&id=${ids.join(',')}&retmode=json${TL}`);
+    const smd=await smr.json();
+    document.getElementById('pgrid').innerHTML=smd.result.uids.map(uid=>{
+      const p=smd.result[uid];if(!p)return '';
+      return `<div class="pc">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.55rem;gap:.6rem;">
+          <div><div style="font-weight:700;font-size:.88rem;line-height:1.3;">${(p.title||'—').substring(0,65)}</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal);margin-top:2px;">${p.accessionversion||uid}</div></div>
+          <span class="bge bg-t" style="flex-shrink:0;">${p.length||'?'} aa</span>
+        </div>
+        <div style="font-size:.72rem;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;margin-bottom:.65rem;">${p.organism||'—'}</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;">
+          <a href="https://www.ncbi.nlm.nih.gov/protein/${uid}" target="_blank" class="btn bo bs" style="font-size:.68rem;">↗ NCBI</a>
+          <a href="https://www.uniprot.org/uniprotkb?query=${encodeURIComponent(p.title||'')}" target="_blank" class="btn bo bs" style="font-size:.68rem;">↗ UniProt</a>
+          <a href="https://www.rcsb.org/search?request=%7B%22query%22%3A%7B%22type%22%3A%22terminal%22%2C%22service%22%3A%22text%22%2C%22parameters%22%3A%7B%22value%22%3A%22${encodeURIComponent(p.accessionversion||'')}%22%7D%7D%7D" target="_blank" class="btn bo bs" style="font-size:.68rem;">↗ PDB</a>
+        </div>
+      </div>`;
+    }).join('');
+    ss('pstatus','ok',`✓ ${smd.result.uids.length} protein records from NCBI.`);
+  }catch(e){ss('pstatus','err',`NCBI error: ${e.message}`);}
+}
+
+// VARIANTS — ClinVar Live
+async function sVars(){
+  const q=(document.getElementById('vq').value||'SNCA').trim();
+  sl('vstatus','Querying NCBI ClinVar…');
+  document.getElementById('vtbody').innerHTML='';
+  try{
+    const term=`${q}[gene] AND (pathogenic[clinsig] OR "likely pathogenic"[clinsig])`;
+    const sr=await fetch(`${EU}esearch.fcgi?db=clinvar&term=${encodeURIComponent(term)}&retmax=20&retmode=json${TL}`);
+    const sd=await sr.json();
+    const ids=sd.esearchresult.idlist;
+    if(!ids.length){ss('vstatus','err',`No ClinVar variants for "${q}". <a href="https://www.ncbi.nlm.nih.gov/clinvar/?term=${encodeURIComponent(q)}" target="_blank" style="color:var(--accent);">Search ClinVar ↗</a>`);return;}
+    const smr=await fetch(`${EU}esummary.fcgi?db=clinvar&id=${ids.join(',')}&retmode=json${TL}`);
+    const smd=await smr.json();
+    document.getElementById('vtbody').innerHTML=smd.result.uids.map(uid=>{
+      const v=smd.result[uid];if(!v)return '';
+      const sig=(v.clinical_significance&&v.clinical_significance.description)||'—';
+      const sc=sig.toLowerCase().includes('pathogenic')&&!sig.toLowerCase().includes('likely')?'bg-r':sig.toLowerCase().includes('likely')?'bg-a':'bg-b';
+      const gene=v.genes&&v.genes.length?v.genes[0].symbol:'—';
+      const cond=v.trait_set&&v.trait_set.length?v.trait_set[0].trait_name:'—';
+      return `<tr>
+        <td style="font-family:'IBM Plex Mono',monospace;font-size:.73rem;"><a href="https://www.ncbi.nlm.nih.gov/clinvar/variation/${uid}" target="_blank">${uid}</a></td>
+        <td style="font-size:.8rem;max-width:170px;overflow:hidden;text-overflow:ellipsis;">${(v.title||'—').substring(0,55)}</td>
+        <td><strong style="color:var(--accent);font-family:'IBM Plex Mono',monospace;">${gene}</strong></td>
+        <td><span class="bge ${sc}">${sig}</span></td>
+        <td style="font-size:.75rem;color:var(--text-muted);">${cond.substring(0,38)}</td>
+        <td><a href="https://www.ncbi.nlm.nih.gov/clinvar/variation/${uid}" target="_blank" class="btn bo bs" style="padding:3px 7px;font-size:.63rem;">View ↗</a></td>
+      </tr>`;
+    }).join('');
+    ss('vstatus','ok',`✓ ${smd.result.uids.length} ClinVar variants from NCBI.`);
+  }catch(e){ss('vstatus','err',`ClinVar error: ${e.message}`);}
+}
+
+// PUBMED — Live
+let pubF='';
+function setPF(el,v){document.querySelectorAll('#panel-literature .fc').forEach(c=>c.classList.remove('active'));el.classList.add('active');pubF=v;}
+async function sPub(){
+  const q=(document.getElementById('lq').value||'').trim();
+  if(!q){ss('lstatus','err','Enter a query.');return;}
+  sl('lstatus','Searching PubMed…');
+  document.getElementById('lresults').innerHTML='';
+  let fq=q+' AND (neurological[TIAB] OR neurodegenerative[TIAB] OR neuron[TIAB] OR synapse[TIAB])';
+  const yr=new Date().getFullYear();
+  if(pubF==='1') fq+=` AND ("${yr-1}"[PDAT]:"${yr}"[PDAT])`;
+  else if(pubF==='5') fq+=` AND ("${yr-5}"[PDAT]:"${yr}"[PDAT])`;
+  else if(pubF==='10') fq+=` AND ("${yr-10}"[PDAT]:"${yr}"[PDAT])`;
+  else if(pubF==='review') fq+=' AND Review[ptyp]';
+  else if(pubF==='free') fq+=' AND free full text[filter]';
+  try{
+    const sr=await fetch(`${EU}esearch.fcgi?db=pubmed&term=${encodeURIComponent(fq)}&retmax=15&sort=relevance&retmode=json${TL}`);
+    const sd=await sr.json();
+    const ids=sd.esearchresult.idlist;
+    const tot=parseInt(sd.esearchresult.count||0);
+    if(!ids.length){ss('lstatus','err',`No results. <a href="https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(q)}" target="_blank" style="color:var(--accent);">Search PubMed ↗</a>`);return;}
+    const smr=await fetch(`${EU}esummary.fcgi?db=pubmed&id=${ids.join(',')}&retmode=json${TL}`);
+    const smd=await smr.json();
+    ss('lstatus','ok',`✓ Showing ${ids.length} of ${tot.toLocaleString()} results. <a href="https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(fq)}" target="_blank" style="color:var(--accent);">View all on PubMed ↗</a>`);
+    document.getElementById('lresults').innerHTML=smd.result.uids.map(uid=>{
+      const p=smd.result[uid];if(!p)return '';
+      const au=p.authors&&p.authors.length?p.authors.slice(0,3).map(a=>a.name).join(', ')+(p.authors.length>3?' et al.':''):'—';
+      return `<div class="pub-r" onclick="this.classList.toggle('ex')">
+        <div class="pt">${p.title||'—'}</div>
+        <div class="pau">${au}</div>
+        <div class="pm">
+          <span class="pj">${p.fulljournalname||p.source||'—'}</span>
+          <span>${(p.pubdate||'').substring(0,4)}</span>
+          ${p.volume?`<span>Vol.${p.volume}${p.issue?` (${p.issue})`:''}</span>`:''}
+          <a href="https://pubmed.ncbi.nlm.nih.gov/${uid}/" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent2);">PMID:${uid} ↗</a>
+          ${p.pmc?`<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/${p.pmc}/" target="_blank" onclick="event.stopPropagation()" style="color:var(--success);">PMC Free ↗</a>`:''}
+        </div>
+        <div class="pabs">Click to expand · Abstract available on <a href="https://pubmed.ncbi.nlm.nih.gov/${uid}/" target="_blank" style="color:var(--accent2);">PubMed ↗</a></div>
+      </div>`;
+    }).join('');
+  }catch(e){ss('lstatus','err',`PubMed error: ${e.message}`);}
+}
+
+// DISEASE DATA
+const DIS=[
+  {n:"Alzheimer's Disease",a:"AD · OMIM:104300",c:"neurodegeneration",d:"Progressive amyloid plaque and tau tangle accumulation causing memory and cognitive decline.",g:["APP","PSEN1","PSEN2","APOE","BIN1","CLU","MAPT"],o:"104300"},
+  {n:"Parkinson's Disease",a:"PD · OMIM:168600",c:"movement",d:"Dopaminergic neuron loss in substantia nigra with Lewy body α-synuclein aggregation.",g:["SNCA","LRRK2","PINK1","PRKN","GBA","VPS35","DJ1"],o:"168600"},
+  {n:"Amyotrophic Lateral Sclerosis",a:"ALS · OMIM:105400",c:"neurodegeneration",d:"Progressive motor neuron death; TDP-43 inclusions and SOD1 mutations are central.",g:["SOD1","FUS","TARDBP","C9orf72","TBK1","OPTN"],o:"105400"},
+  {n:"Huntington's Disease",a:"HD · OMIM:143100",c:"movement",d:"CAG repeat expansion in HTT causing progressive motor, cognitive, and psychiatric decline.",g:["HTT"],o:"143100"},
+  {n:"Multiple Sclerosis",a:"MS · OMIM:126200",c:"demyelinating",d:"Autoimmune CNS demyelination; HLA-DRB1*15:01 is the main genetic risk factor.",g:["HLA-DRB1","IL7R","IL2RA","CLEC16A"],o:"126200"},
+  {n:"Frontotemporal Dementia",a:"FTD · OMIM:600274",c:"neurodegeneration",d:"Frontal/temporal lobe degeneration with TDP-43, tau (MAPT), or FUS pathology.",g:["MAPT","GRN","C9orf72","VCP","CHMP2B"],o:"600274"},
+  {n:"Dravet Syndrome",a:"DS · OMIM:607208",c:"epilepsy",d:"Severe SCN1A-linked epileptic encephalopathy; febrile seizures onset in infancy.",g:["SCN1A","SCN2A","PCDH19"],o:"607208"},
+  {n:"Rett Syndrome",a:"RTT · OMIM:312750",c:"synaptic",d:"X-linked MECP2 disorder causing progressive loss of speech and motor skills in girls.",g:["MECP2","CDKL5","FOXG1"],o:"312750"},
+  {n:"Prion Disease (CJD)",a:"CJD · OMIM:123400",c:"neurodegeneration",d:"Fatal PRNP misfolding cascade leading to spongiform encephalopathy.",g:["PRNP"],o:"123400"},
+  {n:"Spinocerebellar Ataxia",a:"SCA · OMIM:164400",c:"movement",d:"Heterogeneous cerebellar degeneration from CAG or other repeat expansions in ATXN genes.",g:["ATXN1","ATXN2","ATXN3","CACNA1A"],o:"164400"},
+  {n:"Fragile X Syndrome",a:"FXS · OMIM:300624",c:"synaptic",d:"FMR1 CGG expansion silences FMRP — most common inherited intellectual disability.",g:["FMR1","FMR2"],o:"300624"},
+  {n:"Angelman Syndrome",a:"AS · OMIM:105830",c:"synaptic",d:"UBE3A loss causing intellectual disability, absent speech, and seizures.",g:["UBE3A"],o:"105830"},
+];
+let dC='all';
+function rdis(list){
+  document.getElementById('dgrid').innerHTML=list.map(d=>`
+    <div class="dc"><div class="dn">${d.n}</div><div class="da">${d.a}</div><div class="dd">${d.d}</div>
+    <div class="gt">${d.g.map(g=>`<a class="gtag" href="https://www.ncbi.nlm.nih.gov/gene/?term=${g}+neurological" target="_blank">${g}</a>`).join('')}</div>
+    <div class="dl">
+      <a class="dlink" href="https://www.omim.org/entry/${d.o}" target="_blank">OMIM ↗</a>
+      <a class="dlink" href="https://www.ncbi.nlm.nih.gov/gene/?term=${encodeURIComponent(d.n)}" target="_blank">NCBI Gene ↗</a>
+      <a class="dlink" href="https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(d.n+' neurodegeneration')}&sort=relevance" target="_blank">PubMed ↗</a>
+      <a class="dlink" href="https://clinicalgenome.org/gene-disease-validity/?gene=${d.g[0]}" target="_blank">ClinGen ↗</a>
+    </div></div>`).join('');
+}
+function fDis(){
+  const q=(document.getElementById('dq').value||'').toLowerCase();
+  rdis(DIS.filter(d=>(dC==='all'||d.c===dC)&&(!q||d.n.toLowerCase().includes(q)||d.a.toLowerCase().includes(q)||d.g.some(g=>g.toLowerCase().includes(q)))));
+}
+function sDCat(el,c){document.querySelectorAll('#dcf .fc').forEach(x=>x.classList.remove('active'));el.classList.add('active');dC=c;fDis();}
+rdis(DIS);
+
+// PATHWAYS
+const PW=[
+  {id:"hsa05010",n:"Alzheimer's Disease",c:"signaling",g:169,s:"KEGG",d:"Amyloid cascade, tau phosphorylation, neuroinflammation",u:"https://www.kegg.jp/pathway/hsa05010"},
+  {id:"hsa05012",n:"Parkinson's Disease",c:"mitochondria",g:132,s:"KEGG",d:"Dopaminergic death, mitochondrial dysfunction, ubiquitin-proteasome",u:"https://www.kegg.jp/pathway/hsa05012"},
+  {id:"hsa05014",n:"Amyotrophic Lateral Sclerosis",c:"apoptosis",g:51,s:"KEGG",d:"Motor neuron death via oxidative stress and excitotoxicity",u:"https://www.kegg.jp/pathway/hsa05014"},
+  {id:"hsa05016",n:"Huntington's Disease",c:"apoptosis",g:193,s:"KEGG",d:"Mutant huntingtin aggregation and transcriptional dysregulation",u:"https://www.kegg.jp/pathway/hsa05016"},
+  {id:"hsa04722",n:"Neurotrophin Signaling",c:"signaling",g:120,s:"KEGG",d:"BDNF, NGF, TrkA/B for neuronal survival",u:"https://www.kegg.jp/pathway/hsa04722"},
+  {id:"hsa04724",n:"Glutamatergic Synapse",c:"synapse",g:113,s:"KEGG",d:"NMDA/AMPA signaling and postsynaptic density",u:"https://www.kegg.jp/pathway/hsa04724"},
+  {id:"hsa04725",n:"Cholinergic Synapse",c:"synapse",g:112,s:"KEGG",d:"Acetylcholine synthesis, release and receptor signaling",u:"https://www.kegg.jp/pathway/hsa04725"},
+  {id:"hsa04728",n:"Dopaminergic Synapse",c:"synapse",g:130,s:"KEGG",d:"Dopamine receptor signaling, Parkinson's-relevant",u:"https://www.kegg.jp/pathway/hsa04728"},
+  {id:"R-HSA-1474244",n:"Amyloid Fiber Formation",c:"protein",g:42,s:"Reactome",d:"Misfolding kinetics of Aβ, tau, α-synuclein, prion",u:"https://reactome.org/PathwayBrowser/#/R-HSA-1474244"},
+  {id:"R-HSA-9612973",n:"Autophagy Regulation",c:"protein",g:38,s:"Reactome",d:"Autophagy control and aggregate clearance in neurodegeneration",u:"https://reactome.org/PathwayBrowser/#/R-HSA-9612973"},
+];
+function lPw(c,el){
+  if(el){document.querySelectorAll('#panel-pathways .fc').forEach(x=>x.classList.remove('active'));el.classList.add('active');}
+  const list=c==='all'?PW:PW.filter(p=>p.c===c);
+  document.getElementById('pwlist').innerHTML=list.map(p=>`
+    <div class="pwc">
+      <div><div style="font-weight:600;font-size:.88rem;margin-bottom:.18rem;">${p.n}</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--teal);">${p.id} · ${p.s}</div>
+        <div style="font-size:.75rem;color:var(--text-muted);margin-top:.18rem;">${p.d}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:.88rem;color:var(--accent);font-weight:700;">${p.g}</div>
+        <div style="font-size:.62rem;color:var(--text-muted);">genes</div>
+        <a href="${p.u}" target="_blank" class="btn bo bs" style="margin-top:5px;font-size:.68rem;">View ↗</a>
+      </div>
+    </div>`).join('');
+}
+lPw('all',null);
+
+// LOCAL TOOLS
+function cStats(){
+  const s=document.getElementById('ts').value.replace(/\s/g,'').toUpperCase();if(!s)return;
+  const isNA=/^[ATCGURYSWKMBDHVN]+$/i.test(s);
+  const gc=isNA?Math.round(((s.match(/[GC]/g)||[]).length/s.length)*100):null;
+  document.getElementById('tsout').innerHTML=`<div class="ss" style="margin-top:.75rem;grid-template-columns:repeat(3,1fr);">
+    <div class="sb2"><div class="sv">${s.length}</div><div class="sl2">Length</div></div>
+    ${gc!==null?`<div class="sb2"><div class="sv">${gc}%</div><div class="sl2">GC</div></div>`:''}
+    <div class="sb2"><div class="sv">${isNA?'DNA/RNA':'Protein'}</div><div class="sl2">Type</div></div>
+    <div class="sb2"><div class="sv">~${Math.round(s.length*(isNA?330:110)/1000)}kDa</div><div class="sl2">Est MW</div></div>
+  </div>`;
+}
+function cRC(){
+  const s=document.getElementById('trc').value.replace(/\s/g,'').toUpperCase();if(!s)return;
+  const c={A:'T',T:'A',C:'G',G:'C',N:'N',U:'A'};
+  const rc=s.split('').reverse().map(x=>c[x]||x).join('');
+  document.getElementById('trcout').innerHTML=`<div style="margin-top:.75rem;"><div style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--text-muted);margin-bottom:3px;">5'→3' ORIGINAL</div><div style="font-family:'IBM Plex Mono',monospace;font-size:.73rem;color:#60a5fa;word-break:break-all;">${s}</div><div style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--text-muted);margin-top:.55rem;margin-bottom:3px;">REV COMPLEMENT</div><div style="font-family:'IBM Plex Mono',monospace;font-size:.73rem;color:var(--accent);word-break:break-all;">${rc}</div></div>`;
+}
+function cGC(){
+  const s=document.getElementById('tgc').value.replace(/\s/g,'').toUpperCase();if(!s)return;
+  const g=(s.match(/G/g)||[]).length,c=(s.match(/C/g)||[]).length,a=(s.match(/A/g)||[]).length,t=(s.match(/[TU]/g)||[]).length;
+  const gc=Math.round(((g+c)/s.length)*100);
+  document.getElementById('tgcout').innerHTML=`<div class="ss" style="margin-top:.75rem;"><div class="sb2"><div class="sv" style="color:#4ade80;">${a}</div><div class="sl2">A</div></div><div class="sb2"><div class="sv" style="color:#60a5fa;">${t}</div><div class="sl2">T/U</div></div><div class="sb2"><div class="sv" style="color:#f59e0b;">${g}</div><div class="sl2">G</div></div><div class="sb2"><div class="sv" style="color:#c084fc;">${c}</div><div class="sl2">C</div></div></div><div style="margin-top:.75rem;font-weight:700;color:var(--accent);font-family:'IBM Plex Mono',monospace;">GC: ${gc}%<div class="lb" style="margin-top:4px;"><div class="pf" style="width:${gc}%;"></div></div></div>`;
+}
+function cORF(){
+  const s=document.getElementById('torf').value.replace(/\s/g,'').toUpperCase().replace(/U/g,'T');
+  const min=parseInt(document.getElementById('torfm').value)||30;if(!s)return;
+  const stop=['TAA','TAG','TGA'],orfs=[];
+  for(let f=0;f<3;f++){let st=-1;
+    for(let i=f;i<s.length-2;i+=3){const c=s.substring(i,i+3);
+      if(c==='ATG'&&st===-1)st=i;
+      if(stop.includes(c)&&st!==-1){const l=Math.floor((i-st)/3);if(l>=min)orfs.push({f:f+1,st:st+1,sp:i+3,l});st=-1;}
+    }
+  }
+  document.getElementById('torfout').innerHTML=orfs.length?`<p style="font-size:.73rem;color:var(--text-muted);margin-top:.75rem;margin-bottom:5px;">${orfs.length} ORF(s) ≥ ${min} aa</p>${orfs.slice(0,6).map(o=>`<div style="display:flex;gap:9px;font-family:'IBM Plex Mono',monospace;font-size:.7rem;padding:5px 8px;background:var(--surface2);border-radius:5px;margin-bottom:3px;border:1px solid var(--border);"><span style="color:var(--teal);">+${o.f}</span><span>Start:${o.st}</span><span>End:${o.sp}</span><span style="color:var(--accent);">${o.l} aa</span></div>`).join('')}`:`<p style="color:var(--text-muted);font-size:.8rem;margin-top:.6rem;">No ORFs ≥ ${min} aa found.</p>`;
+}
+
+// ADMIN — credentials stored here for demo
+const AU='admin',AP='NeuroAdmin#2025',A2='847291';
+function aLogin(){
+  const u=document.getElementById('au').value,p=document.getElementById('ap').value,c=document.getElementById('a2').value;
+  const m=document.getElementById('amsg');
+  if(!u||!p){m.textContent='⚠ Username + password required.';m.style.color='#f87171';return;}
+  if(!c){m.textContent='⚠ 2FA code required.';m.style.color='#f59e0b';return;}
+  m.textContent='Authenticating…';m.style.color='var(--teal)';
+  setTimeout(()=>{
+    if(u===AU&&p===AP&&c===A2){document.getElementById('aform').style.display='none';document.getElementById('apanel').style.display='block';}
+    else{m.textContent='✕ Invalid credentials or 2FA. Access denied.';m.style.color='#f87171';document.getElementById('ap').value='';document.getElementById('a2').value='';}
+  },950);
+}
+function aLogout(){document.getElementById('aform').style.display='block';document.getElementById('apanel').style.display='none';['au','ap','a2'].forEach(id=>document.getElementById(id).value='');document.getElementById('amsg').textContent='';}
+function aReset(){['au','ap','a2'].forEach(id=>document.getElementById(id).value='');document.getElementById('amsg').textContent='';}
+function adm(n){alert(`Admin: ${n}\nConnect to your backend API to implement.`);}
+
+// INIT — live PubMed count
+fetch(`${EU}esearch.fcgi?db=pubmed&term=neurodegenerative+disease+OR+neurodegeneration&retmode=json${TL}`)
+  .then(r=>r.json()).then(d=>{const n=parseInt(d.esearchresult.count||0);document.getElementById('pm-cnt').textContent=n>0?(n/1000).toFixed(0)+'K':'—';}).catch(()=>{});
+
+// Auto-load defaults
+qGene(document.querySelector('#panel-genes .fc'),'alzheimer neurodegeneration homo sapiens');
+qProt(document.querySelector('#panel-proteins .fc'),'alpha-synuclein Parkinson homo sapiens');
+sVars();
+</script>
+</body>
+</html>
