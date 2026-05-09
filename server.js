@@ -58,8 +58,11 @@ app.post('/blast', async (req, res) => {
     const sub  = await fetch('https://blast.ncbi.nlm.nih.gov/blast/Blast.cgi',
       { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:params });
     const stxt = await sub.text();
-    const rid  = (stxt.match(/RID\s*=\s*([A-Z0-9]+)/) || [])[1];
-    const rtoe = parseInt((stxt.match(/RTOE\s*=\s*(\d+)/) || ['','12'])[1]) * 1000;
+    // Parse RID carefully - must start with a letter and be 6+ chars (not RTOE which is digits only)
+    const ridMatch = stxt.match(/\bRID\s*=\s*([A-Z][A-Z0-9]{5,})/);
+    const rid      = ridMatch ? ridMatch[1] : null;
+    const rtoeMatch = stxt.match(/RTOE\s*=\s*(\d+)/);
+    const rtoe     = rtoeMatch ? parseInt(rtoeMatch[1]) * 1000 : 12000;
 
     if (!rid) return res.status(500).json({ error: 'NCBI did not return a job ID.' });
     console.log(`[BLAST] RID=${rid} | wait=${rtoe/1000}s`);
